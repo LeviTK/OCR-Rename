@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.2 (2026-04-16)
+
+- 新增 `install.sh` 和 `install.ps1`，支持 GitHub 一键安装 CLI
+- README 补充远程安装命令，安装后可直接执行 `ocr-rename scan DIR`
+- 保留 `setup.sh` / `setup.bat` 作为本地源码安装入口
+
+## v3.1 (2026-04-16)
+
+- 将项目打包为可安装 CLI，新增 `pyproject.toml`
+- 提供终端命令 `ocr-rename scan DIR`
+- 更新 Mac / Windows 安装脚本，安装后直接生成 CLI 命令
+- 保留 `run.sh` / `run.bat` 作为兼容包装器
+
 ## v3.0 (2026-04-16)
 
 - 将项目收缩为单一主功能：扫描单个目录并原地重命名票据图片

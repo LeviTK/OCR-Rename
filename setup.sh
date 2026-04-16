@@ -26,10 +26,12 @@ fi
 echo "[3/4] 创建虚拟环境并安装 Python 依赖..."
 "$PYTHON_BIN" -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -e .
 
 echo "[4/4] 依赖自检..."
 .venv/bin/python -c "import PIL, cv2, numpy, pyzbar, zxingcpp; print('Python 依赖检查通过')"
+.venv/bin/ocr-rename --help >/dev/null
+echo "CLI 安装通过: ocr-rename"
 
 if command -v tesseract >/dev/null 2>&1; then
     tesseract --version | head -n 1
@@ -39,5 +41,5 @@ fi
 
 echo ""
 echo "✅ 安装完成"
-echo "   运行: ./run.sh                  (默认处理 ./001-Pic)"
+echo "   运行: .venv/bin/ocr-rename scan /path/to/images"
 echo "   或者: ./run.sh /path/to/images"

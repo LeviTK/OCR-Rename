@@ -29,7 +29,7 @@ if [ ! -d "$INPUT_DIR" ]; then
 fi
 
 if [ "$(uname -s)" = "Darwin" ]; then
-    DYLD_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python -m src --input "$INPUT_DIR"
+    DYLD_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/ocr-rename scan "$INPUT_DIR"
 else
-    .venv/bin/python -m src --input "$INPUT_DIR"
+    .venv/bin/ocr-rename scan "$INPUT_DIR"
 fi

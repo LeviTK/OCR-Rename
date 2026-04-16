@@ -10,11 +10,23 @@ from unittest.mock import patch
 
 from PIL import Image
 
+from src import __main__ as cli
 from src import pipeline
 from src.models import DecodeHit
 
 
 class PipelineTest(unittest.TestCase):
+    def test_cli_scan_maps_directory_to_run_batch(self) -> None:
+        with patch.object(cli, "setup_platform"), \
+             patch("src.pipeline.run_batch", return_value=0) as run_batch:
+            code = cli.main(["scan", "/tmp/images", "--dry-run"])
+
+        self.assertEqual(code, 0)
+        args = run_batch.call_args.args[0]
+        self.assertEqual(args.command, "scan")
+        self.assertEqual(args.input, "/tmp/images")
+        self.assertTrue(args.dry_run)
+
     def test_process_one_scans_numeric_filename_without_special_case(self) -> None:
         original_barcode = pipeline.scan_barcodes
         original_qr = pipeline.scan_qr

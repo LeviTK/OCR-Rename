@@ -24,7 +24,7 @@ if not exist "%INPUT_DIR%" (
     exit /b 1
 )
 
-.venv\Scripts\python.exe -m src --input "%INPUT_DIR%"
+.venv\Scripts\ocr-rename.exe scan "%INPUT_DIR%"
 exit /b %errorlevel%
 
 :help

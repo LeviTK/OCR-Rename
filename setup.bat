@@ -24,12 +24,15 @@ if errorlevel 1 exit /b 1
 echo [3/4] 安装 Python 依赖...
 .venv\Scripts\python.exe -m pip install --upgrade pip
 if errorlevel 1 exit /b 1
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m pip install -e .
 if errorlevel 1 exit /b 1
 
 echo [4/4] 依赖自检...
 .venv\Scripts\python.exe -c "import PIL, cv2, numpy, pyzbar, zxingcpp; print('Python 依赖检查通过')"
 if errorlevel 1 exit /b 1
+.venv\Scripts\ocr-rename.exe --help >nul
+if errorlevel 1 exit /b 1
+echo CLI 安装通过: ocr-rename
 
 echo.
 where tesseract >nul 2>nul
@@ -46,6 +49,6 @@ if errorlevel 1 (
 
 echo.
 echo ✅ 安装完成
-echo    运行: run.bat                  (默认处理项目内的 001-Pic)
+echo    运行: .venv\Scripts\ocr-rename.exe scan "D:\images"
 echo    或者: run.bat "D:\images"
 endlocal

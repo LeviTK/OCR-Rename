@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ocr-rename"
+version = "3.2.0"
+description = "Scan a folder of ticket images and rename them by detected code"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pillow",
+  "opencv-python",
+  "numpy",
+  "pyzbar",
+  "zxing-cpp",
+]
+
+[project.scripts]
+ocr-rename = "src.__main__:main"
+
+[tool.setuptools]
+packages = ["src"]
