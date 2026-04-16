@@ -12,23 +12,22 @@ if /I "%~1"=="-h" goto :help
 if /I "%~1"=="--help" goto :help
 
 if "%~1"=="" (
-    set "BASE_DIR=%ORIGINAL_DIR%"
+    set "INPUT_DIR=%cd%\001-Pic"
 ) else (
     pushd "%ORIGINAL_DIR%" >nul
-    for %%I in ("%~1") do set "BASE_DIR=%%~fI"
+    for %%I in ("%~1") do set "INPUT_DIR=%%~fI"
     popd >nul
 )
 
-set "INPUT_DIR=%BASE_DIR%\000-Pic"
 if not exist "%INPUT_DIR%" (
     echo ❌ 目录不存在: %INPUT_DIR%
     exit /b 1
 )
 
-.venv\Scripts\python.exe -m src scan --input "%INPUT_DIR%"
+.venv\Scripts\python.exe -m src --input "%INPUT_DIR%"
 exit /b %errorlevel%
 
 :help
-echo 用法: run.bat [父目录路径]
-echo 说明: 默认处理 [父目录]\000-Pic 下的图片，执行二维码识别并原地重命名
+echo 用法: run.bat [图片目录]
+echo 说明: 默认处理项目内的 001-Pic\，执行识别并原地重命名
 exit /b 0

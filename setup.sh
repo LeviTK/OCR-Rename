@@ -39,4 +39,5 @@ fi
 
 echo ""
 echo "✅ 安装完成"
-echo "   运行: ./run.sh /path/to/父目录   (会处理该目录下的 000-Pic)"
+echo "   运行: ./run.sh                  (默认处理 ./001-Pic)"
+echo "   或者: ./run.sh /path/to/images"

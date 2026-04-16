@@ -46,5 +46,6 @@ if errorlevel 1 (
 
 echo.
 echo ✅ 安装完成
-echo    运行: run.bat "D:\任意父目录"   (会处理该目录下的 000-Pic)
+echo    运行: run.bat                  (默认处理项目内的 001-Pic)
+echo    或者: run.bat "D:\images"
 endlocal

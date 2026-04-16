@@ -10,27 +10,26 @@ if [ ! -x ".venv/bin/python" ]; then
 fi
 
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
-    echo "用法: ./run.sh [父目录路径]"
-    echo "说明: 默认处理 [父目录]/000-Pic 下的图片，执行二维码识别并原地重命名"
+    echo "用法: ./run.sh [图片目录]"
+    echo "说明: 默认处理项目内的 001-Pic/，执行识别并原地重命名"
     exit 0
 fi
 
 if [ -z "${1:-}" ]; then
-    BASE_DIR="$ORIG_PWD"
+    INPUT_DIR="$(pwd)/001-Pic"
 elif [[ "$1" = /* ]]; then
-    BASE_DIR="$1"
+    INPUT_DIR="$1"
 else
-    BASE_DIR="$ORIG_PWD/$1"
+    INPUT_DIR="$ORIG_PWD/$1"
 fi
 
-INPUT_DIR="$BASE_DIR/000-Pic"
 if [ ! -d "$INPUT_DIR" ]; then
     echo "❌ 目录不存在: $INPUT_DIR"
     exit 1
 fi
 
 if [ "$(uname -s)" = "Darwin" ]; then
-    DYLD_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python -m src scan --input "$INPUT_DIR"
+    DYLD_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/python -m src --input "$INPUT_DIR"
 else
-    .venv/bin/python -m src scan --input "$INPUT_DIR"
+    .venv/bin/python -m src --input "$INPUT_DIR"
 fi
