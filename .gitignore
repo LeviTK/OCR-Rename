@@ -1,0 +1,17 @@
+.DS_Store
+.DS_Store
+.factory/
+.venv/
+__pycache__/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+
+001-Pic/
+003_FaYunDan/
+识别正确/
+未识别/
+
+**/.scan_log.json
+upload_archive.json
