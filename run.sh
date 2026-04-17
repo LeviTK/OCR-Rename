@@ -11,12 +11,12 @@ fi
 
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
     echo "用法: ./run.sh [图片目录]"
-    echo "说明: 默认处理项目内的 001-Pic/，执行识别并原地重命名"
+    echo "说明: 默认处理项目内的 input/，执行识别并原地重命名"
     exit 0
 fi
 
 if [ -z "${1:-}" ]; then
-    INPUT_DIR="$(pwd)/001-Pic"
+    INPUT_DIR="$(pwd)/input"
 elif [[ "$1" = /* ]]; then
     INPUT_DIR="$1"
 else
@@ -28,8 +28,4 @@ if [ ! -d "$INPUT_DIR" ]; then
     exit 1
 fi
 
-if [ "$(uname -s)" = "Darwin" ]; then
-    DYLD_LIBRARY_PATH=/opt/homebrew/lib .venv/bin/ocr-rename scan "$INPUT_DIR"
-else
-    .venv/bin/ocr-rename scan "$INPUT_DIR"
-fi
+.venv/bin/python -m src scan "$INPUT_DIR"

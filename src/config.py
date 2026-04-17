@@ -5,7 +5,23 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+
+def _root_dir() -> Path:
+    bundle_root = getattr(sys, "_MEIPASS", None)
+    if bundle_root:
+        return Path(bundle_root)
+    return Path(__file__).resolve().parent.parent
+
+
+def _prepend_path(path: Path) -> None:
+    current = os.environ.get("PATH", "")
+    parts = [part for part in current.split(os.pathsep) if part]
+    value = str(path)
+    if value not in parts:
+        os.environ["PATH"] = value + os.pathsep + current if current else value
+
+
+ROOT = _root_dir()
 TESSDATA_DIR = ROOT / "tessdata"
 
 
@@ -22,7 +38,11 @@ def setup_platform() -> None:
                 os.add_dll_directory(str(dll_dir))
             except AttributeError:
                 pass
-            os.environ["PATH"] = str(dll_dir) + os.pathsep + os.environ.get("PATH", "")
+            _prepend_path(dll_dir)
+
+        tesseract_dir = ROOT / "tesseract"
+        if tesseract_dir.is_dir():
+            _prepend_path(tesseract_dir)
 
     # 设置 Tesseract tessdata 路径（使用项目自带训练数据）
     if TESSDATA_DIR.is_dir():

@@ -18,7 +18,9 @@ from .qrcode_scan import scan as scan_qr
 from .utils import normalize_numeric_value, rotate_pil
 
 _ROOT = Path(__file__).resolve().parent.parent
-_DEFAULT_INPUT = _ROOT / "001-Pic"
+_DEFAULT_INPUT = _ROOT / "input"
+_PORTABLE_LEGACY_INPUT = _ROOT / "待处理图片"
+_LEGACY_INPUT = _ROOT / "001-Pic"
 
 ProgressCallback = Callable[[Path, int, int, str], None]
 
@@ -186,6 +188,9 @@ def _process_one_timed(
 def _resolve_input_dir(args: argparse.Namespace) -> Path:
     if getattr(args, "input", None):
         return Path(args.input).resolve()
+    for candidate in (_DEFAULT_INPUT, _PORTABLE_LEGACY_INPUT, _LEGACY_INPUT):
+        if candidate.exists():
+            return candidate
     return _DEFAULT_INPUT
 
 

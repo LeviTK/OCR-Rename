@@ -1,0 +1,34 @@
+OCR Rename script guide
+
+Recommended script:
+- start.bat / start.command
+  Use this for normal work.
+  It checks whether .venv exists, runs setup if needed, and then scans input/.
+- OCR-Rename.exe
+  Use this on Windows when you want a no-Python package.
+  You can drag a folder directly onto the exe, or open it with no arguments and enter a folder interactively.
+
+Environment install script:
+- setup.bat / setup.command
+  Use this when you run the package for the first time or when you need to repair the local environment.
+  It only creates .venv and installs dependencies. It does not rename files by itself.
+
+Manual run script:
+- run.bat / run.command
+  Use this only after setup is already complete.
+  It runs the scan directly.
+  Default folder: input/
+  You can also pass another folder path manually.
+
+Windows quick start:
+1. Put images into input\
+2. Double-click start.bat
+
+macOS quick start:
+1. Put images into input/
+2. Double-click start.command
+
+Important notes:
+- In Windows cmd use start.bat directly. Do not use ./start.bat.
+- In Windows cmd use run.bat directly. Do not use ./run.bat.
+- If setup fails on Windows, first confirm that Python 3.10 x64 is installed.

@@ -1,5 +1,37 @@
 # Changelog
 
+## v3.6.0 (2026-04-17)
+
+- 明确支持 Windows `exe` 两种启动方式：直接拖拽文件夹到 `OCR-Rename.exe`，或无参数启动后进入交互提示模式
+- 补强 `Release/build_windows_exe.py`，让 `exe` 包产出 `input/`、`SCRIPT_GUIDE.txt`、`PROJECT_GUIDE.md`、`BUILD_MANIFEST.txt`、`BUILD_REVIEW.txt`
+- 补强 GitHub Actions 的 Windows `exe` 构建与发布链路，使其更适合通过 GitHub Releases 对外分发
+
+## v3.5.0 (2026-04-17)
+
+- 统一改为 ASCII 入口脚本：`start.bat`、`start.command`、`setup.command`、`run.command`
+- 默认输入目录改为 `input/`，同时保留对 `待处理图片/` 和 `001-Pic/` 的兼容回退
+- Release 构建升级为 `Windows + macOS` 双平台离线包，并补充“为什么不直接打包通用 venv”的说明
+- 便携版启动脚本改为优先使用 `.venv` 内的 `python -m src`，降低平台包装脚本失效风险
+
+## v3.4.1 (2026-04-17)
+
+- 新增 `launch.bat` 作为纯 ASCII 的 Windows 启动入口
+- 文档和 Release 使用说明补充 `cmd` 下应直接执行 `launch.bat` 或 `开始重命名.bat`
+- 避免用户在 `cmd` 中误用 `./开始重命名.bat`
+
+## v3.4 (2026-04-17)
+
+- 新增 `项目指南.md`，整理当前代码结构、运行边界和冗余分析
+- 新增 `Release/` 构建链路，生成带版本号的 Windows 便携版目录和 zip 压缩包
+- 便携版构建加入离线 `wheels/`，`setup.bat` 可优先使用本地依赖安装
+- 便携版产物自动写入 `版本.txt`、`使用说明.txt` 和构建审查报告
+
+## v3.3 (2026-04-17)
+
+- 将 Windows 便携版调整为主方案，新增 `待处理图片/` 和 `开始重命名.bat`
+- 默认输入目录改为 `待处理图片/`，保留对旧 `001-Pic/` 的兼容回退
+- `开始重命名.bat` 支持首次运行自动调用本地安装，再执行重命名
+
 ## v3.2 (2026-04-16)
 
 - 新增 `install.sh` 和 `install.ps1`，支持 GitHub 一键安装 CLI

@@ -1,0 +1,6 @@
+Put the images you want to rename into this folder.
+
+Then run:
+- Windows portable package: start.bat
+- Windows EXE package: OCR-Rename.exe
+- macOS: start.command

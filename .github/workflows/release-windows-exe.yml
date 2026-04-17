@@ -1,0 +1,106 @@
+name: Release Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows-exe:
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10 x64
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+
+      - name: Validate tag matches project version
+        shell: powershell
+        run: |
+          $version = py -3.10 -c "from src import __version__; print(__version__)"
+          $refName = "${{ github.ref_name }}"
+          if ($refName -and $refName -ne "v$version") {
+            throw "Tag $refName does not match project version v$version"
+          }
+
+      - name: Install Tesseract runtime
+        shell: powershell
+        run: |
+          choco install tesseract -y --no-progress
+
+          $candidates = @(
+            "$env:ProgramFiles\Tesseract-OCR",
+            "${env:ProgramFiles(x86)}\Tesseract-OCR"
+          )
+
+          $tesseractDir = $candidates | Where-Object {
+            $_ -and (Test-Path (Join-Path $_ 'tesseract.exe'))
+          } | Select-Object -First 1
+
+          if (-not $tesseractDir) {
+            throw 'Tesseract install succeeded but tesseract.exe was not found.'
+          }
+
+          "OCR_RENAME_TESSERACT_DIR=$tesseractDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          & (Join-Path $tesseractDir 'tesseract.exe') --version
+
+      - name: Install build dependencies
+        shell: powershell
+        run: |
+          py -3.10 -m pip install --upgrade pip
+          py -3.10 -m pip install -e .[build]
+
+      - name: Build Windows EXE package
+        shell: cmd
+        run: Release\build_windows_exe.bat
+
+      - name: Create or update GitHub release
+        shell: powershell
+        run: |
+          $zip = Get-ChildItem 'Release/dist/OCR-Rename-windows-exe-v*.zip' | Select-Object -First 1
+          if (-not $zip) {
+            throw 'Built zip package was not found.'
+          }
+
+          $tag = if ("${{ github.ref_type }}" -eq 'tag') { "${{ github.ref_name }}" } else { py -3.10 -c "from src import __version__; print('v' + __version__)" }
+          $title = "OCR-Rename $tag"
+          $notes = @"
+          Windows EXE package built by GitHub Actions.
+
+          - No Python installation is required on the target Windows machine.
+          - Supports dragging a folder directly onto OCR-Rename.exe.
+          - If launched without arguments, the program will prompt for a folder interactively.
+          "@
+
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag $zip.FullName --title $title --notes $notes
+          } else {
+            gh release upload $tag $zip.FullName --clobber
+          }
+
+      - name: Upload Windows EXE package directory artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OCR-Rename-windows-exe-release-package
+          path: |
+            Release/dist/OCR-Rename-windows-exe-v*/**
+            !Release/dist/OCR-Rename-windows-exe-v*.zip
+          if-no-files-found: error
+
+      - name: Upload Windows EXE zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OCR-Rename-windows-exe-release-zip
+          path: Release/dist/OCR-Rename-windows-exe-v*.zip
+          if-no-files-found: error

@@ -14,8 +14,8 @@ fi
 echo "[2/4] 检测并安装系统依赖..."
 if [ "$(uname -s)" = "Darwin" ]; then
     if command -v brew >/dev/null 2>&1; then
-        brew list zbar >/dev/null 2>&1 || brew install zbar
-        brew list tesseract >/dev/null 2>&1 || brew install tesseract
+        brew list zbar >/dev/null 2>&1 || brew install zbar || echo "⚠️ zbar 安装失败，请手动安装"
+        brew list tesseract >/dev/null 2>&1 || brew install tesseract || echo "⚠️ tesseract 安装失败，请手动安装"
     else
         echo "⚠️ 未检测到 Homebrew，请手动安装 zbar 和 tesseract"
     fi
@@ -24,13 +24,27 @@ else
 fi
 
 echo "[3/4] 创建虚拟环境并安装 Python 依赖..."
+mkdir -p "input"
+if [ -d "wheels" ]; then
+    PYTHON_MM="$("$PYTHON_BIN" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")')"
+    if [ "$PYTHON_MM" != "3.10" ]; then
+        echo "❌ 当前离线 wheels 仅支持 Python 3.10，当前是 $PYTHON_MM"
+        exit 1
+    fi
+fi
+
 "$PYTHON_BIN" -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -e .
+if [ -d "wheels" ]; then
+    .venv/bin/python -m pip install --no-index --find-links wheels setuptools wheel packaging
+    .venv/bin/python -m pip install --no-index --find-links wheels .
+else
+    .venv/bin/python -m pip install --upgrade pip
+    .venv/bin/python -m pip install -e .
+fi
 
 echo "[4/4] 依赖自检..."
 .venv/bin/python -c "import PIL, cv2, numpy, pyzbar, zxingcpp; print('Python 依赖检查通过')"
-.venv/bin/ocr-rename --help >/dev/null
+.venv/bin/python -m src --help >/dev/null
 echo "CLI 安装通过: ocr-rename"
 
 if command -v tesseract >/dev/null 2>&1; then
@@ -41,5 +55,7 @@ fi
 
 echo ""
 echo "✅ 安装完成"
-echo "   运行: .venv/bin/ocr-rename scan /path/to/images"
-echo "   或者: ./run.sh /path/to/images"
+echo "   默认目录: ./input"
+echo "   双击运行: start.command"
+echo "   或者: ./run.sh"
+echo "   或者: .venv/bin/python -m src scan /path/to/images"

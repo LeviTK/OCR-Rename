@@ -16,6 +16,50 @@ from src.models import DecodeHit
 
 
 class PipelineTest(unittest.TestCase):
+    def test_resolve_input_dir_prefers_default_input_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            default_input = Path(tmp) / "input"
+            portable_legacy = Path(tmp) / "待处理图片"
+            legacy = Path(tmp) / "001-Pic"
+            default_input.mkdir()
+            portable_legacy.mkdir()
+            legacy.mkdir()
+
+            with patch.object(pipeline, "_DEFAULT_INPUT", default_input), \
+                 patch.object(pipeline, "_PORTABLE_LEGACY_INPUT", portable_legacy), \
+                 patch.object(pipeline, "_LEGACY_INPUT", legacy):
+                resolved = pipeline._resolve_input_dir(argparse.Namespace(input=None))
+
+        self.assertEqual(resolved, default_input)
+
+    def test_resolve_input_dir_falls_back_to_portable_legacy_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            default_input = Path(tmp) / "input"
+            portable_legacy = Path(tmp) / "待处理图片"
+            legacy = Path(tmp) / "001-Pic"
+            portable_legacy.mkdir()
+
+            with patch.object(pipeline, "_DEFAULT_INPUT", default_input), \
+                 patch.object(pipeline, "_PORTABLE_LEGACY_INPUT", portable_legacy), \
+                 patch.object(pipeline, "_LEGACY_INPUT", legacy):
+                resolved = pipeline._resolve_input_dir(argparse.Namespace(input=None))
+
+        self.assertEqual(resolved, portable_legacy)
+
+    def test_resolve_input_dir_falls_back_to_legacy_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            default_input = Path(tmp) / "input"
+            portable_legacy = Path(tmp) / "待处理图片"
+            legacy = Path(tmp) / "001-Pic"
+            legacy.mkdir()
+
+            with patch.object(pipeline, "_DEFAULT_INPUT", default_input), \
+                 patch.object(pipeline, "_PORTABLE_LEGACY_INPUT", portable_legacy), \
+                 patch.object(pipeline, "_LEGACY_INPUT", legacy):
+                resolved = pipeline._resolve_input_dir(argparse.Namespace(input=None))
+
+        self.assertEqual(resolved, legacy)
+
     def test_cli_scan_maps_directory_to_run_batch(self) -> None:
         with patch.object(cli, "setup_platform"), \
              patch("src.pipeline.run_batch", return_value=0) as run_batch:
@@ -26,6 +70,39 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(args.command, "scan")
         self.assertEqual(args.input, "/tmp/images")
         self.assertTrue(args.dry_run)
+
+    def test_cli_directory_without_subcommand_maps_to_run_batch(self) -> None:
+        with patch.object(cli, "setup_platform"), \
+             patch("src.pipeline.run_batch", return_value=0) as run_batch:
+            code = cli.main(["/tmp/images", "--dry-run"])
+
+        self.assertEqual(code, 0)
+        args = run_batch.call_args.args[0]
+        self.assertEqual(args.command, "scan")
+        self.assertEqual(args.input, "/tmp/images")
+        self.assertTrue(args.dry_run)
+
+    def test_cli_prompts_for_directory_when_no_args(self) -> None:
+        with patch.object(cli, "setup_platform"), \
+             patch("builtins.input", return_value='"/tmp/images folder"'), \
+             patch("src.pipeline.run_batch", return_value=0) as run_batch:
+            code = cli.main([])
+
+        self.assertEqual(code, 0)
+        args = run_batch.call_args.args[0]
+        self.assertEqual(args.command, "scan")
+        self.assertEqual(args.input, "/tmp/images folder")
+
+    def test_cli_blank_prompt_uses_default_input_dir(self) -> None:
+        with patch.object(cli, "setup_platform"), \
+             patch("builtins.input", return_value=""), \
+             patch("src.pipeline.run_batch", return_value=0) as run_batch:
+            code = cli.main([])
+
+        self.assertEqual(code, 0)
+        args = run_batch.call_args.args[0]
+        self.assertEqual(args.command, "scan")
+        self.assertIsNone(args.input)
 
     def test_process_one_scans_numeric_filename_without_special_case(self) -> None:
         original_barcode = pipeline.scan_barcodes
