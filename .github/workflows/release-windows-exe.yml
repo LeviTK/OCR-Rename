@@ -84,11 +84,11 @@ jobs:
           - If launched without arguments, the program will prompt for a folder interactively.
           "@
 
-          gh release view $tag *> $null
-          if ($LASTEXITCODE -ne 0) {
-            gh release create $tag $zip.FullName --title $title --notes $notes
-          } else {
+          $existingTags = @(gh release list --limit 100 --json tagName --jq '.[].tagName' 2>$null)
+          if ($existingTags -contains $tag) {
             gh release upload $tag $zip.FullName --clobber
+          } else {
+            gh release create $tag $zip.FullName --title $title --notes $notes
           }
 
       - name: Upload Windows EXE package directory artifact

@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.6.3 (2026-04-17)
+
+- 修复 `release-windows-exe.yml` 中 `gh release view` 在 release 尚不存在时直接导致 PowerShell 步骤失败的问题
+- 改为先枚举已有 release tag，再决定执行 `gh release create` 或 `gh release upload`
+
 ## v3.6.2 (2026-04-17)
 
 - 修复 `Release/build_windows_exe.py` 对 PyInstaller onedir 目录布局的错误校验，改为检查 `_internal/tessdata`
