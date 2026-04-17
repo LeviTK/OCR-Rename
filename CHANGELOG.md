@@ -1,10 +1,17 @@
 # Changelog
 
+## v3.6.1 (2026-04-17)
+
+- 修复 `release-windows-exe.yml` 的 GitHub Actions 运行问题：升级到 `actions/checkout@v5`、`actions/setup-python@v6`
+- 修复 `Release/build_windows_exe.bat` 在 CI 环境中执行时可能被 `pause` 卡住或返回非零退出码的问题
+- 修复 `release-windows-exe.yml` 在 `workflow_dispatch` 下仍错误执行 tag 校验的问题
+
 ## v3.6.0 (2026-04-17)
 
 - 明确支持 Windows `exe` 两种启动方式：直接拖拽文件夹到 `OCR-Rename.exe`，或无参数启动后进入交互提示模式
 - 补强 `Release/build_windows_exe.py`，让 `exe` 包产出 `input/`、`SCRIPT_GUIDE.txt`、`PROJECT_GUIDE.md`、`BUILD_MANIFEST.txt`、`BUILD_REVIEW.txt`
 - 补强 GitHub Actions 的 Windows `exe` 构建与发布链路，使其更适合通过 GitHub Releases 对外分发
+- 将 GitHub Actions 升级到 `actions/checkout@v5`、`actions/setup-python@v6`，并让 `build_windows_exe.bat` 在 CI 中跳过 `pause`
 
 ## v3.5.0 (2026-04-17)
 

@@ -133,6 +133,7 @@ Release/dist/OCR-Rename-windows-exe-v<version>.zip
 - GitHub Actions 工作流文件是：
   - `.github/workflows/build-windows-exe.yml`
   - `.github/workflows/release-windows-exe.yml`
+- CI 中会自动跳过 `Release\build_windows_exe.bat` 末尾的 `pause`
 
 每个离线包包含：
 

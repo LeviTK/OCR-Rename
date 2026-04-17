@@ -14,17 +14,19 @@ jobs:
     runs-on: windows-latest
     env:
       GH_TOKEN: ${{ github.token }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python 3.10 x64
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
           architecture: 'x64'
 
       - name: Validate tag matches project version
+        if: startsWith(github.ref, 'refs/tags/')
         shell: powershell
         run: |
           $version = py -3.10 -c "from src import __version__; print(__version__)"

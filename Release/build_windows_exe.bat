@@ -14,5 +14,7 @@ if not "%EXIT_CODE%"=="0" exit /b %EXIT_CODE%
 
 echo.
 echo [OK] Windows EXE package created.
+if /I "%GITHUB_ACTIONS%"=="true" exit /b 0
+if /I "%CI%"=="true" exit /b 0
 pause
 exit /b 0
