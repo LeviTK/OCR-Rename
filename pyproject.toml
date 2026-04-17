@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ocr-rename"
-version = "3.6.1"
+version = "3.6.2"
 description = "Scan a folder of ticket images and rename them by detected code"
 readme = "README.md"
 requires-python = ">=3.10"

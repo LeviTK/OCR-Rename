@@ -8,7 +8,7 @@ import sys
 import sysconfig
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from zipfile import ZIP_DEFLATED, ZipFile
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -269,6 +269,11 @@ def normalize_eol(path: Path, newline: str) -> None:
     path.write_text(normalized, encoding="utf-8", newline="")
 
 
+def zip_member_name(package_name: str, rel: str | Path) -> str:
+    rel_path = PurePosixPath(str(rel).replace("\\", "/"))
+    return str(PurePosixPath(package_name) / rel_path)
+
+
 def normalize_package_files(package_dir: Path, spec: PackageSpec) -> None:
     for path in package_dir.rglob("*"):
         if not path.is_file():
@@ -361,7 +366,7 @@ def build_zip(package_dir: Path, zip_path: Path) -> None:
             if path.is_dir():
                 continue
             rel = path.relative_to(package_dir)
-            zf.write(path, arcname=str(Path(package_dir.name) / rel))
+            zf.write(path, arcname=zip_member_name(package_dir.name, rel))
 
 
 def review_package(spec: PackageSpec, package_dir: Path, zip_path: Path) -> list[str]:
@@ -398,7 +403,7 @@ def review_package(spec: PackageSpec, package_dir: Path, zip_path: Path) -> list
             for rel in spec.required_paths:
                 if rel == "input" or rel == "wheels":
                     continue
-                expected = str(Path(package_dir.name) / rel)
+                expected = zip_member_name(package_dir.name, rel)
                 if expected not in names and not any(name.startswith(f"{expected}/") for name in names):
                     issues.append(f"zip missing path: {rel}")
 

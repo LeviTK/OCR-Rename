@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.6.2 (2026-04-17)
+
+- 修复 `Release/build_windows_exe.py` 对 PyInstaller onedir 目录布局的错误校验，改为检查 `_internal/tessdata`
+- 修复 Windows 下 zip 审查路径分隔符不一致导致所有文件被误判为缺失的问题
+
 ## v3.6.1 (2026-04-17)
 
 - 修复 `release-windows-exe.yml` 的 GitHub Actions 运行问题：升级到 `actions/checkout@v5`、`actions/setup-python@v6`

@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from zipfile import ZIP_DEFLATED, ZipFile
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -43,7 +43,7 @@ PACKAGE_DIRS = [
 
 REQUIRED_PATHS = [
     "OCR-Rename.exe",
-    "tessdata",
+    "_internal/tessdata",
     "tesseract/tesseract.exe",
     "input",
     "README.md",
@@ -108,6 +108,11 @@ def normalize_package_files(package_dir: Path) -> None:
     for path in package_dir.rglob("*"):
         if path.is_file() and path.suffix == ".txt":
             normalize_eol(path, "\r\n")
+
+
+def zip_member_name(package_name: str, rel: str | Path) -> str:
+    rel_path = PurePosixPath(str(rel).replace("\\", "/"))
+    return str(PurePosixPath(package_name) / rel_path)
 
 
 def find_tesseract_dir() -> Path:
@@ -258,7 +263,7 @@ def build_zip(package_dir: Path, zip_path: Path) -> None:
             if path.is_dir():
                 continue
             rel = path.relative_to(package_dir)
-            zf.write(path, arcname=str(Path(package_dir.name) / rel))
+            zf.write(path, arcname=zip_member_name(package_dir.name, rel))
 
 
 def review_package(package_dir: Path, zip_path: Path) -> list[str]:
@@ -285,7 +290,7 @@ def review_package(package_dir: Path, zip_path: Path) -> list[str]:
     with ZipFile(zip_path) as zf:
         names = set(zf.namelist())
         for rel in REQUIRED_PATHS:
-            expected = str(Path(package_dir.name) / rel)
+            expected = zip_member_name(package_dir.name, rel)
             if expected not in names and not any(name.startswith(f"{expected}/") for name in names):
                 issues.append(f"zip missing path: {rel}")
 
